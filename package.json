@@ -1,0 +1,15 @@
+{
+    "name": "com.lns.dialogue-system",
+    "displayName": "Dialogue System",
+    "version": "1.0.0",
+    "unity": "2022.3",
+    "description": "A simple dialogue system for own proposes.",
+    "type": "module",
+    "dependencies": {
+        "com.unity.textmeshpro": "3.0.9"
+    },
+    "author": {
+        "name": "Alexandre Gaudencio - Lucas Fernandes",
+        "email": ""
+    }
+}
