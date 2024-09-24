@@ -581,7 +581,7 @@ namespace DialogueSystem.Editor.Windows
             List<DSNode> groupedNodesList = groupedNodes[group][nodeName].Nodes;  // Obtém a lista de nós do dicionário do grupo
 
             groupedNodesList.Add(node);  // Adiciona o nó à lista de nós
-            Debug.Log($"teste: {nodeName}");
+            // Debug.Log($"teste: {nodeName}");
 
             // foreach (DSNode item in groupedNodesList)
             // {

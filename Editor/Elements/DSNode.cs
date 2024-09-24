@@ -75,7 +75,7 @@ namespace DialogueSystem.Editor.Elements
                 ++graphView.NameErrorsAmount;
             }
 
-            charactersDialogueAnimations = DSIOUtility.LoadAsset<CharacterDialogueAnimations>("Assets/Plugins/DialogueResources", "CharactersDialogueAnimations");// <CharacterDialogueAnimations>("Assets/DataBase/Dialogues/DialogueAnimations/CharactersDialogueAnimations")
+            charactersDialogueAnimations = DSIOUtility.LoadAsset<CharacterDialogueAnimations>("Assets/Dialogue System/Resources", "CharactersDialogueAnimations");// <CharacterDialogueAnimations>("Assets/DataBase/Dialogues/DialogueAnimations/CharactersDialogueAnimations")
             if (!charactersDialogueAnimations) Debug.LogError("Node não conseguiu encontrar as animações de dialogo, por favor cheque o caminho para este asset.");
 
 
@@ -151,7 +151,7 @@ namespace DialogueSystem.Editor.Elements
 
 
             if (DialogueName != "") UpdateAnimationDropdownOnLoad();
-            else Debug.Log("node nova");
+            // else Debug.Log("node nova");
 
 
         }
@@ -212,7 +212,7 @@ namespace DialogueSystem.Editor.Elements
         {
             animations = charactersDialogueAnimations.GetAnimationsForCharacter(Actor.ToString()).Select(anim => anim.name).ToList();
             animationDropdown.choices = animations;
-            Debug.Log($"UpdateAnimationDropdownOnLoad {SpeechAnimation}");
+            // Debug.Log($"UpdateAnimationDropdownOnLoad {SpeechAnimation}");
             int currenAnimationIndex = animations.IndexOf(SpeechAnimation);
             animationDropdown.value = SpeechAnimation;
         }

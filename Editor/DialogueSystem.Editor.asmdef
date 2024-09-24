@@ -1,6 +1,6 @@
 {
     "name": "DialogueSystem.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "DialogueSystem",
     "references": [
         "GUID:346328aa3e9500143a7d170d287f6e28",
         "GUID:070ac024aeb175046af8bf885d919142",

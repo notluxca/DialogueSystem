@@ -1,55 +1,70 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 namespace DialogueSystem
 {
+    using DialogueSystem.Enumerations;
     using ScriptableObjects;
     public class DialogueActor : MonoBehaviour
     {
-        [SerializeField] DialogueUIManager dialogueUIManager;
         public CharacterDialogueAnimations characterDialogueAnimations; // modificar para receber o speech animation diretamente do graphview como animation clip 
         public Animator animator;
+        public CanvasGroup canvasGroup;
 
-        public string ActorName;
+
+
+        public DSActor Actor;
         public bool Active;
 
         void Start()
         {
+            Active = false;
             animator = GetComponent<Animator>();
+            canvasGroup.alpha = 0;
         }
 
         void OnEnable()
         {
-            if (dialogueUIManager == null) Debug.Log("dialogueisNull");
-            dialogueUIManager.OnDialogueChanged += EvaluateAnimation;
+            // if (dialogueUIManager == null) Debug.Log("dialogueisNull");
+            DialogueUIManager.OnDialogueChanged += OnDialogueChange;
         }
 
-        void EvaluateAnimation(string Actor, string SpeechAnimation)
+        void OnDialogueChange(DSActor Actor, string SpeechAnimation)
         {
-            if (Active)
+            if (!Active && this.Actor == Actor)
             {
-                if (ActorName == Actor)
-                {
-                    AnimationClip animationTest = characterDialogueAnimations.GetAnimationClip(ActorName, SpeechAnimation);
-                    ChangeAnimation(animationTest);
-                }
-                else
-                {
-                    AnimationClip animationTest = characterDialogueAnimations.GetAnimationClip(ActorName, "listening");
-                    ChangeAnimation(animationTest);
-                }
+                Active = true;
+                canvasGroup.alpha = 1;
+                SetAnimation(SpeechAnimation);
+
             }
+
+
+            if (this.Actor == Actor)
+            {
+                SetAnimation(SpeechAnimation);
+            }
+            else
+            {
+                SetAnimation("listening");
+            }
+
         }
 
+        public void SetAnimation(string animation)
+        {
+            AnimationClip animationClip = characterDialogueAnimations.GetAnimationClip(this.Actor, animation);
+            Debug.Log($"{animationClip.name} on {Actor}");
+            ChangeAnimation(animationClip);
 
-        public void InitializeActor(string Actor, string Animation)
+        }
+
+        public void InitializeActor(DSActor Actor, string animation)
         {
             Active = true;
-            ActorName = Actor;
-            // Debug.Log($"{Animation} Animation initializar");
-            // if (characterDialogueAnimations.GetAnimationClip(ActorName, Animation)) Debug.Log("Oiii apareci"); //* Funcionando
-            AnimationClip animationTest = characterDialogueAnimations.GetAnimationClip(ActorName, Animation);
-            ChangeAnimation(animationTest);
+            this.Actor = Actor;
+            SetAnimation(animation);
         }
 
         void ChangeAnimation(AnimationClip newClip)

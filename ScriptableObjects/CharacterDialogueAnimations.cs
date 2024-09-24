@@ -23,9 +23,9 @@ namespace DialogueSystem.ScriptableObjects
             return characterAnimations != null ? characterAnimations.dialogueAnimations : new List<AnimationClip>();
         }
 
-        public AnimationClip GetAnimationClip(string actor, string animationName)
+        public AnimationClip GetAnimationClip(DSActor actor, string animationName)
         {
-            CharacterAnimations characterAnimations = charactersAnimationsList.Find(c => c.characterName.ToString() == actor);
+            CharacterAnimations characterAnimations = charactersAnimationsList.Find(c => c.characterName.ToString() == actor.ToString());
             if (characterAnimations != null)
             {
                 return characterAnimations.dialogueAnimations.Find(animation => animation.name == animationName);
