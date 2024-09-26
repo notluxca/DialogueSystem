@@ -15,10 +15,13 @@ MonoBehaviour:
   charactersAnimationsList:
   - characterName: 1
     dialogueAnimations:
-    - {fileID: 7400000, guid: 4fe51f112f39b174ea88484c90ca8643, type: 2}
+    - {fileID: 7400000, guid: 2e07a471996a89044ab670a1b6d70384, type: 2}
     - {fileID: 7400000, guid: f74e724e606597d44bd3542c5a3b8425, type: 2}
   - characterName: 3
     dialogueAnimations:
     - {fileID: 7400000, guid: 2e07a471996a89044ab670a1b6d70384, type: 2}
-    - {fileID: 7400000, guid: 69780b6d02d13c8429fbc3de9799a31d, type: 2}
-    - {fileID: 7400000, guid: bf696113b98d1544887cece06ddbd286, type: 2}
+    - {fileID: 7400000, guid: f74e724e606597d44bd3542c5a3b8425, type: 2}
+  - characterName: 2
+    dialogueAnimations:
+    - {fileID: 7400000, guid: 2e07a471996a89044ab670a1b6d70384, type: 2}
+    - {fileID: 7400000, guid: f74e724e606597d44bd3542c5a3b8425, type: 2}
