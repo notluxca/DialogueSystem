@@ -8,40 +8,38 @@ namespace DialogueSystem
     using ScriptableObjects;
     public class DialogueActor : MonoBehaviour
     {
-        public CharacterDialogueAnimations characterDialogueAnimations; // modificar para receber o speech animation diretamente do graphview como animation clip 
-        public Animator animator;
-        public CanvasGroup canvasGroup;
+        CharacterDialogueAnimations characterAnimations; // modificar para receber o speech animation diretamente do graphview como animation clip 
+        private Animator animator;
+        private CanvasGroup canvasGroup;
+        public AnimationClip currentAnimationClip = null;
 
 
+        [SerializeField] private DSActor actor;
+        private bool active = false;
 
-        public DSActor Actor;
-        public bool Active;
-
-        void Start()
+        void Awake()
         {
-            Active = false;
+            canvasGroup = GetComponent<CanvasGroup>();
             animator = GetComponent<Animator>();
             canvasGroup.alpha = 0;
         }
 
         void OnEnable()
         {
-            // if (dialogueUIManager == null) Debug.Log("dialogueisNull");
             DialogueUIManager.OnDialogueChanged += OnDialogueChange;
         }
 
         void OnDialogueChange(DSActor Actor, string SpeechAnimation)
         {
-            if (!Active && this.Actor == Actor)
+
+            if (!active && this.actor == Actor)
             {
-                Active = true;
+                active = true;
                 canvasGroup.alpha = 1;
                 SetAnimation(SpeechAnimation);
-
+                // return;
             }
-
-
-            if (this.Actor == Actor)
+            if (this.actor == Actor)
             {
                 SetAnimation(SpeechAnimation);
             }
@@ -54,27 +52,26 @@ namespace DialogueSystem
 
         public void SetAnimation(string animation)
         {
-            AnimationClip animationClip = characterDialogueAnimations.GetAnimationClip(this.Actor, animation);
-            Debug.Log($"{animationClip.name} on {Actor}");
-            ChangeAnimation(animationClip);
+            AnimationClip animationClip = characterAnimations.GetAnimationClip(this.actor, animation);
+            Debug.Log($"{animationClip.name} on {actor}");
+            currentAnimationClip = animationClip;
+            ChangeCurrentAnimation(animationClip);
 
         }
 
-        public void InitializeActor(DSActor Actor, string animation)
+        public void InitializeActor(DSActor Actor, CharacterDialogueAnimations characterAnimations)
         {
-            Active = true;
-            this.Actor = Actor;
-            SetAnimation(animation);
+            //Debug.Log("Actor tried to initialize");
+            this.active = true;
+            this.characterAnimations = characterAnimations;
+            canvasGroup.alpha = 1;
+            active = true;
+            this.actor = Actor;
+            SetAnimation("listening");
         }
 
-        void ChangeAnimation(AnimationClip newClip)
+        void ChangeCurrentAnimation(AnimationClip newClip)
         {
-            if (newClip == null)
-            {
-                Debug.LogError("New animation clip is null!");
-                return;
-            }
-
             if (animator.runtimeAnimatorController == null)
             {
                 Debug.LogError("Animator runtime controller is null!");
@@ -91,13 +88,19 @@ namespace DialogueSystem
 
             var currentClip = overrideController.runtimeAnimatorController.animationClips[0];
             var overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>
-            {
-                new KeyValuePair<AnimationClip, AnimationClip>(currentClip, newClip)
-            };
+                {
+                    new KeyValuePair<AnimationClip, AnimationClip>(currentClip, newClip)
+                };
 
             overrideController.ApplyOverrides(overrides);
             animator.runtimeAnimatorController = overrideController;
             animator.Play("default", 0, 0);
+
+        }
+
+        void OnDisable()
+        {
+            DialogueUIManager.OnDialogueChanged -= OnDialogueChange;
         }
 
     }

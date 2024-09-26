@@ -40,18 +40,17 @@ namespace DialogueSystem
         public event Action OnDialogueEnd = delegate { };
 
         public GameObject rightGroup;
-        List<DSActor> actorsOnRightGroup = new List<DSActor>(); // Inicializa uma lista vazia
+        public List<DSActor> actors = new List<DSActor>(); // Inicializa uma lista vazia
         private Vector3 originalScale = new Vector3(1.4f, 1.4f, 1); // modificar para ser dinamico
 
 
 
-        // iniciar o primeiro current dialogue
+        //* iniciar o primeiro current dialogue
         private void Start()
         {
             // characterAnimations = DSIOUtility.LoadAsset<CharacterDialogueAnimations>("Assets/Plugins/DialogueResources", "CharactersDialogueAnimations");
             dialogueUI.SetActive(false);
             dialogueGroupSelector = GetComponent<DialogueGroupSelector>();
-            // currentDialogue = dialogueGroupSelector.targetDialogue;
             if (currentDialogue == null) currentDialogue = dialogueGroupSelector.targetDialogue;
         }
 
@@ -66,6 +65,7 @@ namespace DialogueSystem
 
         public void StartDialogue(DialogueGroupSelector dialogue)
         {
+            actors = dialogue.ActorsOnDialogue;
             dialogueUI.SetActive(true);
             isDialogueHappening = true;
             currentDialogue = dialogue.targetDialogue;
@@ -73,10 +73,10 @@ namespace DialogueSystem
             OnDialogueStart.Invoke();
         }
 
-        // private void Update()
-        // {
-        //     CheckForInput();
-        // }
+        private void Update()
+        {
+            InputDetected();
+        }
 
         private void InputDetected()
         {
@@ -107,17 +107,20 @@ namespace DialogueSystem
             currentDialogue = currentDialogue.Choices[0].NextDialogue;
             dialogueText.SetText(currentDialogue.RequestText);
             DSActor newActor = currentDialogue.Actor; // passar o actor
-
+            characterNameText.SetText(newActor.ToString());
+            PlayPopAnimation(characterNameText);
+            dialogueText.alignment = TextAlignmentOptions.Left;
+            //* refatorar
             //*  Quando o new actor for diferente do actor default (player)
-            if (newActor != dialogueGroupSelector.ActorsOnDialogue[0])
-            {
-                // Debug.Log(dialogueGroupSelector.ActorsOnDialogue[1]);
-                SetOnRightGroup(listeningCharacter, newActor, currentDialogue.speechAnimation, listenerNameText);
-            }
-            else
-            {
-                SetCharacterState(talkingCharacter, newActor, currentDialogue.speechAnimation, characterNameText); //* O primeiro character a falar nesse caso esta sendo considerado o player, que fica ao lado esquerdo
-            }
+            // if (newActor != dialogueGroupSelector.ActorsOnDialogue[0])
+            // {
+            //     // Debug.Log(dialogueGroupSelector.ActorsOnDialogue[1]);
+            //     // SetOnRightGroup(listeningCharacter, newActor, currentDialogue.speechAnimation, listenerNameText);
+            // }
+            // else
+            // {
+            //     SetCharacterState(talkingCharacter, newActor, currentDialogue.speechAnimation, characterNameText); //* O primeiro character a falar nesse caso esta sendo considerado o player, que fica ao lado esquerdo
+            // }
             OnDialogueChanged?.Invoke(newActor, currentDialogue.speechAnimation);
         }
 
@@ -132,56 +135,70 @@ namespace DialogueSystem
                 });
         }
 
+
+        //* REFATORAR ---------------------
         // Unificação de SetCharacterForTalking e SetCharacterForListening
-        private void SetCharacterState(Animator characterAnimator, DSActor actor, string animation, TMP_Text nameText)
+        // private void SetCharacterState(Animator characterAnimator, DSActor actor, string animation, TMP_Text nameText)
+        // {
+
+        //     talkingCharacter.gameObject.GetComponent<DialogueActor>().InitializeActor(actor, animation);
+        // }
+
+        // private void SetOnRightGroup(Animator characterAnimator, DSActor actor, string animation, TMP_Text nameText)
+        // {
+        //     nameText.SetText(actor.ToString());
+        //     dialogueText.alignment = TextAlignmentOptions.Right;
+        //     PlayPopAnimation(nameText);
+
+
+        //     // // se o ator não está no grupo adicione ele no grupo
+        //     // if (!actors.Contains(actor))
+        //     // {
+        //     //     actors.Add(actor);
+        //     // }
+        // }
+        //* Refatorar ---------------------
+        void InitializeActors()
         {
-            nameText.SetText(actor.ToString());
-            dialogueText.alignment = TextAlignmentOptions.Left;
-            talkingCharacter.gameObject.GetComponent<DialogueActor>().InitializeActor(actor, animation);
-            PlayPopAnimation(nameText);
-        }
-
-
-        private void SetOnRightGroup(Animator characterAnimator, DSActor actor, string animation, TMP_Text nameText)
-        {
-            nameText.SetText(actor.ToString());
-            dialogueText.alignment = TextAlignmentOptions.Right;
-            PlayPopAnimation(nameText);
-
-            // se o ator não está no grupo adicione ele no grupo
-            if (!actorsOnRightGroup.Contains(actor))
+            Debug.Log("cheguei no initialize actors");
+            var DialogueActors = GetComponentsInChildren<DialogueActor>();
+            for (int i = 0; i < actors.Count; i++)
             {
-                actorsOnRightGroup.Add(actor);
-            }
-        }
 
+                DialogueActors[i].InitializeActor(actors[i], characterAnimations);
+            }
+
+        }
 
 
         private void InitializeDialogueUI(DSDialogueSO currentDialogue)
         {
+            //* updating text
             dialogueText.text = currentDialogue.RequestText;
             characterNameText.text = currentDialogue.Actor.ToString();
             PlayPopAnimation(characterNameText);
 
-            if (currentDialogue != null)
-            {
-                talkingCharacter.gameObject.GetComponent<DialogueActor>().InitializeActor(currentDialogue.Actor, currentDialogue.speechAnimation.ToString());
-            }
 
-            if (dialogueGroupSelector.ActorsOnDialogue.Count >= 1)
-            {
-                string firstListener = dialogueGroupSelector.ActorsOnDialogue[1].ToString();
-                // Debug.Log($"First talking {dialogueGroupSelector.firstTalking}");
-            }
+            //* set first actor
+            InitializeActors();
             OnDialogueChanged?.Invoke(currentDialogue.Actor, currentDialogue.speechAnimation);
+            // if (currentDialogue != null)
+            // {
+            //     talkingCharacter.gameObject.GetComponent<DialogueActor>().InitializeActor(currentDialogue.Actor, currentDialogue.speechAnimation.ToString());
+            // }
 
+            // if (dialogueGroupSelector.ActorsOnDialogue.Count >= 1)
+            // {
+            //     string firstListener = dialogueGroupSelector.ActorsOnDialogue[1].ToString();
+            //     // Debug.Log($"First talking {dialogueGroupSelector.firstTalking}");
+            // }
         }
 
         private void FinishDialogue()
         {
             dialogueUI.SetActive(false);
             isDialogueHappening = false;
-            actorsOnRightGroup.Clear();
+            actors.Clear();
             dialogueText.text = "";
             listenerNameText.text = "";
             characterNameText.text = "";
