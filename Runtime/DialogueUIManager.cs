@@ -12,6 +12,7 @@ namespace DialogueSystem
 {
     using DialogueSystem.Enumerations;
     using ScriptableObjects;
+    using UnityEngine.InputSystem;
 
     [RequireComponent(typeof(DialogueGroupSelector))]
     public class DialogueUIManager : MonoBehaviour
@@ -33,6 +34,7 @@ namespace DialogueSystem
         [SerializeField] private Animator listeningCharacter;
         [SerializeField] private float popDuration = 0.2f;
         [SerializeField] private float popScale = 1.2f;
+        [SerializeField] InputActionReference inputActionReference;
 
 
         public static event Action<DSActor, string> OnDialogueChanged = delegate { }; // evento pra disparar toda vez que o dialogo muda
@@ -52,6 +54,7 @@ namespace DialogueSystem
             dialogueUI.SetActive(false);
             dialogueGroupSelector = GetComponent<DialogueGroupSelector>();
             if (currentDialogue == null) currentDialogue = dialogueGroupSelector.targetDialogue;
+
         }
 
         private void OnEnable()
@@ -78,6 +81,9 @@ namespace DialogueSystem
             InputDetected();
         }
 
+
+        //* REFATORAR: switch to new input system
+        // inputActionReference.action.WasPressedThisFrame();
         private void InputDetected()
         {
             if (isDialogueHappening && Input.anyKeyDown)

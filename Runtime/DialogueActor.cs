@@ -9,6 +9,7 @@ namespace DialogueSystem
     using UnityEngine.UI;
     using DG.Tweening;
 
+
     public class DialogueActor : MonoBehaviour
     {
         CharacterDialogueAnimations characterAnimations; // modificar para receber o speech animation diretamente do graphview como animation clip 
@@ -36,13 +37,14 @@ namespace DialogueSystem
             animator = GetComponent<Animator>();
             canvasGroup.alpha = 0;
 
-            //* rectTransform.sizeDelta = new Vector2(0, 0); modificando a width e height do rect transform
+
         }
 
         void OnEnable()
         {
             haveTalked = false;
             DialogueUIManager.OnDialogueChanged += OnDialogueChange;
+
         }
 
         void OnDialogueChange(DSActor Actor, string SpeechAnimation)
@@ -50,28 +52,32 @@ namespace DialogueSystem
 
             if (!active && this.actor == Actor)
             {
+                //* first time on scene
+                //* animate entrance
+                //* rectTransform.sizeDelta = new Vector2(0, 0); modificando a width e height do rect transform
                 active = true;
                 canvasGroup.alpha = 1;
                 image.color = new Color32(255, 255, 255, 255);
+
                 SetAnimation(SpeechAnimation);
+
                 // return;
             }
             if (this.actor == Actor)
             {
-                float duration = 2f;
-
                 // Animate the color from white to dark over time
-                image.color = startColor; // Set the initial color
-                image.DOColor(darkColor, duration); // Transition to the dark color
-
                 canvasGroup.alpha = 1;
-                image.color = new Color32(255, 255, 255, 255);
+                image.DOColor(startColor, 0.5f); // Transition to the dark color
                 SetAnimation(SpeechAnimation);
             }
             else
             {
-                image.color = new Color32(100, 100, 100, 255);
+
+
+                image.DOColor(darkColor, 0.5f); // Transition to the dark color
+                                                // image.color = new Color32(120, 120, 120, 255);
                 SetAnimation("listening");
+
             }
 
             // ChangeCurrentAnimation(currentAnimationClip);
@@ -79,8 +85,19 @@ namespace DialogueSystem
 
         public void SetAnimation(string animation)
         {
+            if (characterAnimations == null)
+            {
+                Debug.LogError("CharacterAnimations is not set! Make sure InitializeActor() was called.");
+                return;
+            }
+
             AnimationClip animationClip = characterAnimations.GetAnimationClip(this.actor, animation);
-            // Debug.Log($"{animationClip.name} on {actor}");
+            if (animationClip == null)
+            {
+                Debug.LogError($"AnimationClip not found for {actor} with animation {animation}");
+                return;
+            }
+
             currentAnimationClip = animationClip;
             ChangeCurrentAnimation(animationClip);
         }
@@ -93,7 +110,7 @@ namespace DialogueSystem
             canvasGroup.alpha = 0;
             active = true;
             this.actor = Actor;
-            // SetAnimation("listening");
+            SetAnimation("listening");
         }
 
         void ChangeCurrentAnimation(AnimationClip newClip)
@@ -129,6 +146,7 @@ namespace DialogueSystem
 
         void OnDisable()
         {
+            canvasGroup.alpha = 0;
             DialogueUIManager.OnDialogueChanged -= OnDialogueChange;
         }
 
