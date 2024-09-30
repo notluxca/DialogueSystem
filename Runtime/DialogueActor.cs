@@ -12,18 +12,18 @@ namespace DialogueSystem
 
     public class DialogueActor : MonoBehaviour
     {
-        CharacterDialogueAnimations characterAnimations; // modificar para receber o speech animation diretamente do graphview como animation clip 
+        [SerializeField] CharacterDialogueAnimations characterAnimations; // modificar para receber o speech animation diretamente do graphview como animation clip 
         private Animator animator;
         private CanvasGroup canvasGroup;
         public AnimationClip currentAnimationClip = null;
-        private RectTransform rectTransform;
+        [SerializeField] private RectTransform rectTransform;
         private Image image;
         bool haveTalked;
         // Original color (white, fully visible)
         Color32 startColor = new Color32(255, 255, 255, 255);
 
         // Dark color (dark gray, fully visible) or another dark color of your choice
-        Color32 darkColor = new Color32(50, 50, 50, 255);
+        Color32 darkColor = new Color32(80, 80, 80, 255);
 
 
         [SerializeField] private DSActor actor;
@@ -47,18 +47,30 @@ namespace DialogueSystem
 
         }
 
+        public void InitializeActor(DSActor Actor, CharacterDialogueAnimations characterAnimations)
+        {
+            //Debug.Log("Actor tried to initialize");
+            this.active = true;
+            this.characterAnimations = characterAnimations;
+            canvasGroup.alpha = 0;
+            active = false;
+            this.actor = Actor;
+
+            SetAnimation("listening");
+        }
+
         void OnDialogueChange(DSActor Actor, string SpeechAnimation)
         {
-
+            Debug.Log("Mudança no dialogo");
             if (!active && this.actor == Actor)
             {
+                Debug.Log($"{Actor} inicializado");
                 //* first time on scene
                 //* animate entrance
-                //* rectTransform.sizeDelta = new Vector2(0, 0); modificando a width e height do rect transform
                 active = true;
                 canvasGroup.alpha = 1;
                 image.color = new Color32(255, 255, 255, 255);
-
+                rectTransform.DOSizeDelta(new Vector2(674, 819), 1f);
                 SetAnimation(SpeechAnimation);
 
                 // return;
@@ -70,14 +82,10 @@ namespace DialogueSystem
                 image.DOColor(startColor, 0.5f); // Transition to the dark color
                 SetAnimation(SpeechAnimation);
             }
-            else
+            else if (active && this.actor != Actor)
             {
-
-
                 image.DOColor(darkColor, 0.5f); // Transition to the dark color
-                                                // image.color = new Color32(120, 120, 120, 255);
                 SetAnimation("listening");
-
             }
 
             // ChangeCurrentAnimation(currentAnimationClip);
@@ -102,16 +110,6 @@ namespace DialogueSystem
             ChangeCurrentAnimation(animationClip);
         }
 
-        public void InitializeActor(DSActor Actor, CharacterDialogueAnimations characterAnimations)
-        {
-            //Debug.Log("Actor tried to initialize");
-            this.active = true;
-            this.characterAnimations = characterAnimations;
-            canvasGroup.alpha = 0;
-            active = true;
-            this.actor = Actor;
-            SetAnimation("listening");
-        }
 
         void ChangeCurrentAnimation(AnimationClip newClip)
         {
@@ -129,7 +127,7 @@ namespace DialogueSystem
                 return;
             }
 
-            Debug.Log($"trying to change {newClip.name}");
+            // Debug.Log($"trying to change {newClip.name}");
             var currentClip = overrideController.runtimeAnimatorController.animationClips[0];
             var overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>
                 {

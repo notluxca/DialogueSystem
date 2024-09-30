@@ -20,7 +20,7 @@ namespace DialogueSystem
         private bool isDialogueHappening = false;
 
         [Header("References")]
-        [SerializeField] private CharacterDialogueAnimations characterAnimations;
+        [SerializeField] public CharacterDialogueAnimations characterAnimations;
         [SerializeField] private GameObject dialogueUI;
         [SerializeField] private TMP_Text dialogueText;
         [SerializeField] private TMP_Text characterNameText;
@@ -107,7 +107,7 @@ namespace DialogueSystem
         }
 
 
-
+        //* REFACTOR: um de um lado um do outro
         private void UpdateDialogue()
         {
             currentDialogue = currentDialogue.Choices[0].NextDialogue;
@@ -134,13 +134,37 @@ namespace DialogueSystem
 
         void InitializeActors()
         {
-            // Debug.Log("cheguei no initialize actors");
+
             var DialogueActors = GetComponentsInChildren<DialogueActor>();
+
+            // Defina dois arrays, um para os atores da esquerda e outro para os da direita
+            DialogueActor[] leftSideActors = { DialogueActors[0], DialogueActors[1] }; // Supondo que os dois primeiros são da esquerda
+            DialogueActor[] rightSideActors = { DialogueActors[2], DialogueActors[3] }; // Supondo que os dois últimos são da direita
+                                                                                        // Debug.Log("cheguei no initialize actors");
+                                                                                        //* Um de um lado um do outro
+                                                                                        //* Ter dois grupos separados
+                                                                                        //* 
+                                                                                        // Alternar entre os lados
+            bool isLeftSide = true;
+
             for (int i = 0; i < actors.Count; i++)
             {
+                if (isLeftSide && leftSideActors.Length > 0)
+                {
+                    // Inicializa no lado esquerdo
+                    leftSideActors[i / 2].InitializeActor(actors[i], characterAnimations);
+                }
+                else if (!isLeftSide && rightSideActors.Length > 0)
+                {
+                    // Inicializa no lado direito
+                    rightSideActors[i / 2].InitializeActor(actors[i], characterAnimations);
+                }
 
-                DialogueActors[i].InitializeActor(actors[i], characterAnimations);
+                // Alterna o lado
+                isLeftSide = !isLeftSide;
             }
+
+            OnDialogueChanged?.Invoke(currentDialogue.Actor, currentDialogue.speechAnimation);
 
         }
 
@@ -155,7 +179,7 @@ namespace DialogueSystem
 
             //* set first actor
             InitializeActors();
-            OnDialogueChanged?.Invoke(currentDialogue.Actor, currentDialogue.speechAnimation);
+            // OnDialogueChanged?.Invoke(currentDialogue.Actor, currentDialogue.speechAnimation);
         }
 
         private void FinishDialogue()

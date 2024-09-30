@@ -93,8 +93,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4257623875274424046}
   - {fileID: 8356733993477377905}
+  - {fileID: 4257623875274424046}
   m_Father: {fileID: 4214967436619642371}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
@@ -405,6 +405,7 @@ MonoBehaviour:
   listeningCharacter: {fileID: 0}
   popDuration: 0.2
   popScale: 1.2
+  inputActionReference: {fileID: 0}
   rightGroup: {fileID: 1597659212890403239}
   actors: 
 --- !u!1 &6602584910761182152
