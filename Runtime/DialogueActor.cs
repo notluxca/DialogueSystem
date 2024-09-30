@@ -12,18 +12,21 @@ namespace DialogueSystem
 
     public class DialogueActor : MonoBehaviour
     {
-        [SerializeField] CharacterDialogueAnimations characterAnimations; // modificar para receber o speech animation diretamente do graphview como animation clip 
+        [Header("Animation settings")]
+        [SerializeField] float Fadetime;
+        [SerializeField] Color32 darkColor = new Color32(80, 80, 80, 255);
+        Color32 startColor = new Color32(255, 255, 255, 255);
+        public AnimationClip currentAnimationClip = null;
+        [SerializeField] float EntranceSlideDuration = 1f;
+        [SerializeField] float SlideDistance = 150f;
+
+
+        CharacterDialogueAnimations characterAnimations; // modificar para receber o speech animation diretamente do graphview como animation clip 
         private Animator animator;
         private CanvasGroup canvasGroup;
-        public AnimationClip currentAnimationClip = null;
         [SerializeField] private RectTransform rectTransform;
         private Image image;
-        bool haveTalked;
-        // Original color (white, fully visible)
-        Color32 startColor = new Color32(255, 255, 255, 255);
 
-        // Dark color (dark gray, fully visible) or another dark color of your choice
-        Color32 darkColor = new Color32(80, 80, 80, 255);
 
 
         [SerializeField] private DSActor actor;
@@ -31,10 +34,11 @@ namespace DialogueSystem
 
         void Awake()
         {
-            image = GetComponent<Image>();
             rectTransform = GetComponent<RectTransform>();
             canvasGroup = GetComponent<CanvasGroup>();
-            animator = GetComponent<Animator>();
+
+            image = GetComponentInChildren<Image>();
+            animator = GetComponentInChildren<Animator>();
             canvasGroup.alpha = 0;
 
 
@@ -42,7 +46,6 @@ namespace DialogueSystem
 
         void OnEnable()
         {
-            haveTalked = false;
             DialogueUIManager.OnDialogueChanged += OnDialogueChange;
 
         }
@@ -61,19 +64,29 @@ namespace DialogueSystem
 
         void OnDialogueChange(DSActor Actor, string SpeechAnimation)
         {
-            Debug.Log("Mudança no dialogo");
             if (!active && this.actor == Actor)
             {
-                Debug.Log($"{Actor} inicializado");
                 //* first time on scene
                 //* animate entrance
                 active = true;
-                canvasGroup.alpha = 1;
+                canvasGroup.alpha = 0;
+                canvasGroup.DOFade(1, 0.3f).SetEase(Ease.OutSine);
+
                 image.color = new Color32(255, 255, 255, 255);
-                rectTransform.DOSizeDelta(new Vector2(674, 819), 1f);
                 SetAnimation(SpeechAnimation);
 
-                // return;
+
+
+                // Pega a posição original do item
+                Vector3 originalPosition = this.gameObject.GetComponent<RectTransform>().anchoredPosition;
+                Vector3 StartPosition = this.gameObject.GetComponent<RectTransform>().anchoredPosition;
+                StartPosition -= new Vector3(150, 0, 0);
+                this.gameObject.GetComponent<RectTransform>().transform.position = StartPosition;
+                // Define a nova posição movendo na horizontal (eixo X
+                // Mova o item usando DOTween 
+                this.gameObject.GetComponent<RectTransform>().DOAnchorPos(originalPosition, EntranceSlideDuration).SetEase(Ease.InOutQuad);
+
+                return;
             }
             if (this.actor == Actor)
             {
