@@ -26,11 +26,12 @@ namespace DialogueSystem
         private CanvasGroup canvasGroup;
         [SerializeField] private RectTransform rectTransform;
         private Image image;
+        Vector3 startPosition;
 
 
 
-        [SerializeField] private DSActor actor;
-        private bool active = false;
+        [SerializeField] public DSActor actor; //! 
+        [SerializeField] private bool active = false;
 
         void Awake()
         {
@@ -52,13 +53,12 @@ namespace DialogueSystem
 
         public void InitializeActor(DSActor Actor, CharacterDialogueAnimations characterAnimations)
         {
-            //Debug.Log("Actor tried to initialize");
+            // Debug.Log("Actor tried to initialize");
             this.active = true;
             this.characterAnimations = characterAnimations;
             canvasGroup.alpha = 0;
             active = false;
             this.actor = Actor;
-
             SetAnimation("listening");
         }
 
@@ -66,25 +66,38 @@ namespace DialogueSystem
         {
             if (!active && this.actor == Actor)
             {
-                //* first time on scene
-                //* animate entrance
+                // Primeira vez na cena
                 active = true;
+
+                // Faz fade in no CanvasGroup
                 canvasGroup.alpha = 0;
                 canvasGroup.DOFade(1, 0.3f).SetEase(Ease.OutSine);
 
+                // Define a cor da imagem
                 image.color = new Color32(255, 255, 255, 255);
+
+                // Define a animação de fala
                 SetAnimation(SpeechAnimation);
 
+                // Pega a posição original do RectTransform
+                RectTransform rectTransform = this.gameObject.GetComponent<RectTransform>();
+                Vector3 originalPosition = rectTransform.anchoredPosition;
 
+                // Define a posição de início fora da tela (vindo da esquerda)
+                if (rectTransform.transform.localScale.x == -1)
+                {
+                    startPosition = originalPosition + new Vector3(150, 0, 0); ;
+                }
+                else
+                {
+                    startPosition = originalPosition - new Vector3(150, 0, 0); ;
+                }
+                // Move 150 unidades para a esquerda
+                rectTransform.anchoredPosition = startPosition;
 
-                // Pega a posição original do item
-                Vector3 originalPosition = this.gameObject.GetComponent<RectTransform>().anchoredPosition;
-                Vector3 StartPosition = this.gameObject.GetComponent<RectTransform>().anchoredPosition;
-                StartPosition -= new Vector3(150, 0, 0);
-                this.gameObject.GetComponent<RectTransform>().transform.position = StartPosition;
-                // Define a nova posição movendo na horizontal (eixo X
-                // Mova o item usando DOTween 
-                this.gameObject.GetComponent<RectTransform>().DOAnchorPos(originalPosition, EntranceSlideDuration).SetEase(Ease.InOutQuad);
+                // Anima a entrada do item até a posição original
+                rectTransform.DOAnchorPos(originalPosition, EntranceSlideDuration).SetEase(Ease.OutQuint);
+
 
                 return;
             }
@@ -159,6 +172,8 @@ namespace DialogueSystem
         {
             canvasGroup.alpha = 0;
             DialogueUIManager.OnDialogueChanged -= OnDialogueChange;
+            active = false;
+
         }
 
     }

@@ -158,8 +158,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ee2a510197e43e4788373b4f8c39022, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterAnimations: {fileID: 0}
+  Fadetime: 0.5
+  darkColor:
+    serializedVersion: 2
+    rgba: 4288190616
   currentAnimationClip: {fileID: 0}
+  EntranceSlideDuration: 1.4
+  SlideDistance: 300
   rectTransform: {fileID: 0}
   actor: 0
 --- !u!114 &802700786859838792

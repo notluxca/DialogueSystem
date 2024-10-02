@@ -10,6 +10,8 @@ using System.Collections.Generic;
 
 namespace DialogueSystem
 {
+    using System.Collections;
+    using System.Text;
     using DialogueSystem.Enumerations;
     using ScriptableObjects;
     using UnityEngine.InputSystem;
@@ -44,6 +46,9 @@ namespace DialogueSystem
         public GameObject rightGroup;
         public List<DSActor> actors = new List<DSActor>(); // Inicializa uma lista vazia
         private Vector3 originalScale = new Vector3(1.4f, 1.4f, 1); // modificar para ser dinamico
+
+        StringBuilder dialogueStringBuilder;
+        private bool textAnimationHappening;
 
 
 
@@ -93,7 +98,14 @@ namespace DialogueSystem
                     FinishDialogue();
                     return;
                 }
-                UpdateDialogue();
+                if (!textAnimationHappening) UpdateDialogue();
+                else
+                {
+                    StopAllCoroutines();
+                    dialogueText.SetText(currentDialogue.RequestText);
+                    textAnimationHappening = false;
+                    // UpdateDialogue();
+                }
 
             }
         }
@@ -111,11 +123,31 @@ namespace DialogueSystem
         private void UpdateDialogue()
         {
             currentDialogue = currentDialogue.Choices[0].NextDialogue;
-            dialogueText.SetText(currentDialogue.RequestText);
+            StartCoroutine(PrintCharsMessage());
+            // dialogueText.SetText(currentDialogue.RequestText);
             DSActor newActor = currentDialogue.Actor; // passar o actor
-            characterNameText.SetText(newActor.ToString());
-            PlayPopAnimation(characterNameText);
-            dialogueText.alignment = TextAlignmentOptions.Left;
+
+            if (IsActorOnLeftSide(newActor))
+            {
+                // Atualiza o nome no lado esquerdo
+                characterNameText.SetText(newActor.ToString());
+                dialogueText.alignment = TextAlignmentOptions.Left;
+                PlayPopAnimation(characterNameText);
+            }
+            else
+            {
+                // Atualiza o nome no lado direito
+                listenerNameText.SetText(newActor.ToString());
+                dialogueText.alignment = TextAlignmentOptions.Right;
+                PlayPopAnimation(listenerNameText);
+            }
+
+            // characterNameText.SetText(newActor.ToString());
+            // PlayPopAnimation(characterNameText);
+
+
+
+
             OnDialogueChanged?.Invoke(newActor, currentDialogue.speechAnimation);
         }
 
@@ -134,35 +166,35 @@ namespace DialogueSystem
 
         void InitializeActors()
         {
-
             var DialogueActors = GetComponentsInChildren<DialogueActor>();
 
             // Defina dois arrays, um para os atores da esquerda e outro para os da direita
-            DialogueActor[] leftSideActors = { DialogueActors[0], DialogueActors[1] }; // Supondo que os dois primeiros são da esquerda
-            DialogueActor[] rightSideActors = { DialogueActors[2], DialogueActors[3] }; // Supondo que os dois últimos são da direita
-                                                                                        // Debug.Log("cheguei no initialize actors");
-                                                                                        //* Um de um lado um do outro
-                                                                                        //* Ter dois grupos separados
-                                                                                        //* 
-                                                                                        // Alternar entre os lados
+            DialogueActor[] leftSideActors = { DialogueActors[0], DialogueActors[1] }; // Dois primeiros para a esquerda
+            DialogueActor[] rightSideActors = { DialogueActors[2], DialogueActors[3] }; // Dois últimos para a direita
+
             bool isLeftSide = true;
 
+            //* não é uinicializado na segunda vez
             for (int i = 0; i < actors.Count; i++)
             {
                 if (isLeftSide && leftSideActors.Length > 0)
                 {
                     // Inicializa no lado esquerdo
                     leftSideActors[i / 2].InitializeActor(actors[i], characterAnimations);
+                    Debug.Log($"LeftSide: {actors[i]}");
                 }
                 else if (!isLeftSide && rightSideActors.Length > 0)
                 {
                     // Inicializa no lado direito
                     rightSideActors[i / 2].InitializeActor(actors[i], characterAnimations);
+                    Debug.Log($"rightSide: {actors[i]}");
                 }
 
                 // Alterna o lado
                 isLeftSide = !isLeftSide;
             }
+
+
 
             OnDialogueChanged?.Invoke(currentDialogue.Actor, currentDialogue.speechAnimation);
 
@@ -172,26 +204,50 @@ namespace DialogueSystem
         private void InitializeDialogueUI(DSDialogueSO currentDialogue)
         {
             //* updating text
-            dialogueText.text = currentDialogue.RequestText;
-            characterNameText.text = currentDialogue.Actor.ToString();
+            // dialogueText.text = currentDialogue.RequestText;
+            // characterNameText.text = currentDialogue.Actor.ToString();
+            InitializeActors();
+            UpdateDialogue();
             PlayPopAnimation(characterNameText);
 
 
             //* set first actor
-            InitializeActors();
             // OnDialogueChanged?.Invoke(currentDialogue.Actor, currentDialogue.speechAnimation);
         }
 
+        private IEnumerator PrintCharsMessage()
+        {
+            textAnimationHappening = true;
+            string dialogMessage = currentDialogue.RequestText;
+            // dialogueText = currentDialogue.RequestText;
+            dialogueText.SetText(string.Empty);
+            dialogueStringBuilder = new StringBuilder();
+            for (int i = 0; i < dialogMessage.Length; i++)
+            {
+                dialogueStringBuilder.Append(dialogMessage[i]);
+                dialogueText.SetText(dialogueStringBuilder);
+                yield return new WaitForSeconds(0.020f);
+            }
+
+            textAnimationHappening = false;
+
+        }
+
+        private bool IsActorOnLeftSide(DSActor actor)
+        {
+            return actors.IndexOf(actor) % 2 == 0;
+        }
         private void FinishDialogue()
         {
+            // Resetar variáveis e estados
             dialogueUI.SetActive(false);
             isDialogueHappening = false;
+            currentDialogue = null;
             actors.Clear();
             dialogueText.text = "";
             listenerNameText.text = "";
             characterNameText.text = "";
             OnDialogueEnd.Invoke();
-
         }
 
 
