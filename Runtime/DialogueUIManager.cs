@@ -32,8 +32,6 @@ namespace DialogueSystem
         private DSDialogueSO currentDialogue;
 
         [Header("Dialogue Animation Settings")]
-        [SerializeField] private Animator talkingCharacter;
-        [SerializeField] private Animator listeningCharacter;
         [SerializeField] private float popDuration = 0.2f;
         [SerializeField] private float popScale = 1.2f;
         [SerializeField] InputActionReference inputActionReference;
@@ -43,7 +41,6 @@ namespace DialogueSystem
         public event Action OnDialogueStart = delegate { };
         public event Action OnDialogueEnd = delegate { };
 
-        public GameObject rightGroup;
         public List<DSActor> actors = new List<DSActor>(); // Inicializa uma lista vazia
         private Vector3 originalScale = new Vector3(1.4f, 1.4f, 1); // modificar para ser dinamico
 
@@ -166,9 +163,9 @@ namespace DialogueSystem
 
         void InitializeActors()
         {
-            var DialogueActors = GetComponentsInChildren<DialogueActor>();
 
-            // Defina dois arrays, um para os atores da esquerda e outro para os da direita
+            var DialogueActors = GetComponentsInChildren<DialogueActor>();
+            // Define duas arrays e o primeiro e segundo personagem no dialogo vão para a array leftSide
             DialogueActor[] leftSideActors = { DialogueActors[0], DialogueActors[1] }; // Dois primeiros para a esquerda
             DialogueActor[] rightSideActors = { DialogueActors[2], DialogueActors[3] }; // Dois últimos para a direita
 
@@ -181,13 +178,11 @@ namespace DialogueSystem
                 {
                     // Inicializa no lado esquerdo
                     leftSideActors[i / 2].InitializeActor(actors[i], characterAnimations);
-                    Debug.Log($"LeftSide: {actors[i]}");
                 }
                 else if (!isLeftSide && rightSideActors.Length > 0)
                 {
                     // Inicializa no lado direito
                     rightSideActors[i / 2].InitializeActor(actors[i], characterAnimations);
-                    Debug.Log($"rightSide: {actors[i]}");
                 }
 
                 // Alterna o lado
@@ -203,15 +198,10 @@ namespace DialogueSystem
 
         private void InitializeDialogueUI(DSDialogueSO currentDialogue)
         {
-            //* updating text
-            // dialogueText.text = currentDialogue.RequestText;
-            // characterNameText.text = currentDialogue.Actor.ToString();
             InitializeActors();
             UpdateDialogue();
             PlayPopAnimation(characterNameText);
-
-
-            //* set first actor
+            //* set first actore
             // OnDialogueChanged?.Invoke(currentDialogue.Actor, currentDialogue.speechAnimation);
         }
 
@@ -242,12 +232,25 @@ namespace DialogueSystem
             // Resetar variáveis e estados
             dialogueUI.SetActive(false);
             isDialogueHappening = false;
+
+            // Limpar o diálogo atual e resetar os textos
             currentDialogue = null;
-            actors.Clear();
             dialogueText.text = "";
             listenerNameText.text = "";
             characterNameText.text = "";
-            OnDialogueEnd.Invoke();
+
+            // Limpar a lista de atores
+            // actors.Clear(); //! provavelmente oque está causando o erro, essa não é a lista correta de atores
+
+            // Desinscrever eventos, se necessário (adapte conforme a lógica do seu projeto)
+            // inputActionReference.action.performed -= OnInputAction;
+
+            // Parar animações ou corrotinas que possam estar rodando
+            StopAllCoroutines();
+
+            // Resetar estados visuais ou animações
+
+            OnDialogueEnd.Invoke(); // Invocar o evento de finalização do diálogo
         }
 
 

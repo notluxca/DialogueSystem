@@ -108,7 +108,7 @@ namespace DialogueSystem
                 image.DOColor(startColor, 0.5f); // Transition to the dark color
                 SetAnimation(SpeechAnimation);
             }
-            else if (active && this.actor != Actor)
+            else if (active && this.actor != Actor && currentAnimationClip.name != "listening")
             {
                 image.DOColor(darkColor, 0.5f); // Transition to the dark color
                 SetAnimation("listening");
