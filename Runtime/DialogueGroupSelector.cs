@@ -24,8 +24,7 @@ namespace DialogueSystem
         public DSDialogueSO targetDialogue => dialogue;
 
         [SerializeField] private List<UnityEvent> onDialogueTextRequested;
-        public DSActor firstListener;
-        public DSActor firstTalking;
+
 
 
 
@@ -93,8 +92,7 @@ namespace DialogueSystem
                 }
             }
             // ActorsOnDialogue.Reverse();
-            firstTalking = ActorsOnDialogue[0];
-            firstListener = ActorsOnDialogue[1];
+
         }
     }
 }

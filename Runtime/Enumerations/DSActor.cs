@@ -5,8 +5,10 @@ namespace DialogueSystem.Enumerations
     {
         None,
         Thaynara,
-        Uyara
-        ,Leo
+        Uyara,
+        Leo,
+        Dev
+
     }
 
 }

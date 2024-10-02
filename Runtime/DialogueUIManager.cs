@@ -46,12 +46,17 @@ namespace DialogueSystem
 
         StringBuilder dialogueStringBuilder;
         private bool textAnimationHappening;
+        private float originalTextSpeed;
+        public float textSpeed;
+        public float speedBoost;
+
 
 
 
         //* iniciar o primeiro current dialogue
         private void Start()
         {
+            originalTextSpeed = textSpeed;
             // characterAnimations = DSIOUtility.LoadAsset<CharacterDialogueAnimations>("Assets/Plugins/DialogueResources", "CharactersDialogueAnimations");
             dialogueUI.SetActive(false);
             dialogueGroupSelector = GetComponent<DialogueGroupSelector>();
@@ -98,9 +103,10 @@ namespace DialogueSystem
                 if (!textAnimationHappening) UpdateDialogue();
                 else
                 {
-                    StopAllCoroutines();
-                    dialogueText.SetText(currentDialogue.RequestText);
-                    textAnimationHappening = false;
+                    textSpeed -= speedBoost;
+                    // StopAllCoroutines();
+                    // dialogueText.SetText(currentDialogue.RequestText);
+                    // textAnimationHappening = false;
                     // UpdateDialogue();
                 }
 
@@ -128,14 +134,14 @@ namespace DialogueSystem
             {
                 // Atualiza o nome no lado esquerdo
                 characterNameText.SetText(newActor.ToString());
-                dialogueText.alignment = TextAlignmentOptions.Left;
+                dialogueText.alignment = TextAlignmentOptions.Center;
                 PlayPopAnimation(characterNameText);
             }
             else
             {
                 // Atualiza o nome no lado direito
                 listenerNameText.SetText(newActor.ToString());
-                dialogueText.alignment = TextAlignmentOptions.Right;
+                dialogueText.alignment = TextAlignmentOptions.Center;
                 PlayPopAnimation(listenerNameText);
             }
 
@@ -178,11 +184,13 @@ namespace DialogueSystem
                 {
                     // Inicializa no lado esquerdo
                     leftSideActors[i / 2].InitializeActor(actors[i], characterAnimations);
+
                 }
                 else if (!isLeftSide && rightSideActors.Length > 0)
                 {
                     // Inicializa no lado direito
                     rightSideActors[i / 2].InitializeActor(actors[i], characterAnimations);
+
                 }
 
                 // Alterna o lado
@@ -199,10 +207,32 @@ namespace DialogueSystem
         private void InitializeDialogueUI(DSDialogueSO currentDialogue)
         {
             InitializeActors();
-            UpdateDialogue();
+
+            // Definir o primeiro diálogo diretamente
+            // dialogueText.SetText(currentDialogue.RequestText);
+            StartCoroutine(PrintCharsMessage());
+
+            DSActor newActor = currentDialogue.Actor; // passar o ator
+
+            if (IsActorOnLeftSide(newActor))
+            {
+                // Atualiza o nome no lado esquerdo
+                characterNameText.SetText(newActor.ToString());
+                dialogueText.alignment = TextAlignmentOptions.Center;
+                PlayPopAnimation(characterNameText);
+            }
+            else
+            {
+                // Atualiza o nome no lado direito
+                listenerNameText.SetText(newActor.ToString());
+                dialogueText.alignment = TextAlignmentOptions.Center;
+                PlayPopAnimation(listenerNameText);
+            }
+
+            // Disparar o evento OnDialogueChanged com o ator e a animação de fala
+            OnDialogueChanged?.Invoke(newActor, currentDialogue.speechAnimation);
+
             PlayPopAnimation(characterNameText);
-            //* set first actore
-            // OnDialogueChanged?.Invoke(currentDialogue.Actor, currentDialogue.speechAnimation);
         }
 
         private IEnumerator PrintCharsMessage()
@@ -216,10 +246,11 @@ namespace DialogueSystem
             {
                 dialogueStringBuilder.Append(dialogMessage[i]);
                 dialogueText.SetText(dialogueStringBuilder);
-                yield return new WaitForSeconds(0.020f);
+                yield return new WaitForSeconds(textSpeed);
             }
 
             textAnimationHappening = false;
+            textSpeed = originalTextSpeed;
 
         }
 

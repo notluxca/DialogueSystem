@@ -25,3 +25,7 @@ MonoBehaviour:
     dialogueAnimations:
     - {fileID: 7400000, guid: 2e07a471996a89044ab670a1b6d70384, type: 2}
     - {fileID: 7400000, guid: f74e724e606597d44bd3542c5a3b8425, type: 2}
+  - characterName: 4
+    dialogueAnimations:
+    - {fileID: 7400000, guid: 2e07a471996a89044ab670a1b6d70384, type: 2}
+    - {fileID: 7400000, guid: f74e724e606597d44bd3542c5a3b8425, type: 2}
