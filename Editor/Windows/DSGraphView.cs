@@ -8,10 +8,10 @@ namespace DialogueSystem.Editor.Windows
 {
     using Data.Error;
     using Data.Save;
+    using DialogueSystem.Utilities;
     using Elements;
     using Enumerations;
     using Utilities;
-    using DialogueSystem.Utilities;
 
 
     public class EdgeConnectionListener : IEdgeConnectorListener
@@ -25,6 +25,7 @@ namespace DialogueSystem.Editor.Windows
 
         public void OnDrop(GraphView graphView, Edge edge)
         {
+
         }
 
         public void OnDropOutsidePort(Edge edge, Vector2 position)
@@ -37,6 +38,9 @@ namespace DialogueSystem.Editor.Windows
                 var newEdge = edge.output.ConnectTo(newNode.inputContainer[0] as Port);
                 _graphView.AddElement(newNode);
                 _graphView.AddElement(newEdge);
+
+                _graphView.SaveChoiceIdFromOutput(newEdge);
+
             }
 
             edge.RemoveFromHierarchy();
@@ -399,6 +403,13 @@ namespace DialogueSystem.Editor.Windows
             };
         }
 
+        public void SaveChoiceIdFromOutput(Edge edge)
+        {
+            DSNode nextNode = (DSNode)edge.input.node;
+            DSChoiceSaveData choiceData = (DSChoiceSaveData)edge.output.userData;
+            choiceData.NodeID = nextNode.ID;
+        }
+
         private void OnGraphViewChanged()
         {
 
@@ -411,13 +422,11 @@ namespace DialogueSystem.Editor.Windows
 
                     foreach (Edge edge in changes.edgesToCreate)
                     {
-                        // edge.OnSelected?.invoke
-                        Debug.Log("Node: " + edge.input.node.title + " ___ " + edge.output.node.title);
-                        DSNode nextNode = (DSNode)edge.input.node;
+                        SaveChoiceIdFromOutput(edge);
+                        //DSNode nextNode = (DSNode)edge.input.node;
+                        //DSChoiceSaveData choiceData = (DSChoiceSaveData)edge.output.userData;
 
-                        DSChoiceSaveData choiceData = (DSChoiceSaveData)edge.output.userData;
-
-                        choiceData.NodeID = nextNode.ID;
+                        //choiceData.NodeID = nextNode.ID;
                     }
                 }
 
