@@ -364,13 +364,13 @@ namespace DialogueSystem.Editor.Utilities
         //! O problema pode estar aqui, as connections sendo salvas mas não conseguindo carregar (improvavel)
         private static void LoadNodesConnections()
         {
-            Debug.Log("Teste de load connection");
+            // Debug.Log("Teste de load connection");
             foreach (KeyValuePair<string, DSNode> loadedNode in loadedNodes)
             {
                 foreach (Port choicePort in loadedNode.Value.outputContainer.Children())
                 {
                     DSChoiceSaveData choiceData = (DSChoiceSaveData)choicePort.userData;
-                    if (choiceData == null) Debug.LogError("Choice Data Null");
+                    if (choiceData.NodeID != null) Debug.LogError("Choice Data Null");
                     if (string.IsNullOrEmpty(choiceData.NodeID.ToString())) //! Acusou : NullReferenceException: Object reference not set to an instance of an object
                     {
                         continue;
@@ -444,7 +444,7 @@ namespace DialogueSystem.Editor.Utilities
         //! verificar
         public static T CreateAsset<T>(string path, string assetName) where T : ScriptableObject
         {
-            string pattern = @"[^a-zA-Z0-9]";
+            string pattern = @"[^a-zA-Z]";
             assetName = Regex.Replace(assetName, pattern, "");
             string fullPath = $"{path}/{assetName}.asset";
 
