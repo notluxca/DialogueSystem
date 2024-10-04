@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 namespace DialogueSystem.Editor.Utilities
 {
@@ -360,14 +361,17 @@ namespace DialogueSystem.Editor.Utilities
             }
         }
 
+        //! O problema pode estar aqui, as connections sendo salvas mas não conseguindo carregar (improvavel)
         private static void LoadNodesConnections()
         {
+            Debug.Log("Teste de load connection");
             foreach (KeyValuePair<string, DSNode> loadedNode in loadedNodes)
             {
                 foreach (Port choicePort in loadedNode.Value.outputContainer.Children())
                 {
                     DSChoiceSaveData choiceData = (DSChoiceSaveData)choicePort.userData;
-                    if (string.IsNullOrEmpty(choiceData.NodeID.ToString()))
+                    if (choiceData == null) Debug.LogError("Choice Data Null");
+                    if (string.IsNullOrEmpty(choiceData.NodeID.ToString())) //! Acusou : NullReferenceException: Object reference not set to an instance of an object
                     {
                         continue;
                     }
@@ -381,6 +385,7 @@ namespace DialogueSystem.Editor.Utilities
                     graphView.AddElement(edge);
 
                     loadedNode.Value.RefreshPorts();
+                    Debug.Log($"Carregou a edge {choiceData.NodeID.ToString()}");
                 }
             }
         }
@@ -436,9 +441,17 @@ namespace DialogueSystem.Editor.Utilities
             FileUtil.DeleteFileOrDirectory($"{path}/");
         }
 
+        //! verificar
         public static T CreateAsset<T>(string path, string assetName) where T : ScriptableObject
         {
+            string pattern = @"[^a-zA-Z0-9]";
+            assetName = Regex.Replace(assetName, pattern, "");
             string fullPath = $"{path}/{assetName}.asset";
+
+            // Regex pattern to keep only letters and digits(a - z, A - Z, 0 - 9)
+
+            // Replace any character that doesn't match the pattern with an empty string
+
 
             T asset = LoadAsset<T>(path, assetName);
 
@@ -450,6 +463,8 @@ namespace DialogueSystem.Editor.Utilities
 
             return asset;
         }
+
+
 
         public static T LoadAsset<T>(string path, string assetName) where T : ScriptableObject
         {
