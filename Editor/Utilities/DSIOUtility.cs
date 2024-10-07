@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using System.Text.RegularExpressions;
 
 namespace DialogueSystem.Editor.Utilities
 {
     using Data.Save;
+    using DialogueSystem.Utilities;
     using Elements;
     using ScriptableObjects;
     using Windows;
-    using DialogueSystem.Utilities;
 
     public static class DSIOUtility
     {
@@ -441,19 +441,19 @@ namespace DialogueSystem.Editor.Utilities
             FileUtil.DeleteFileOrDirectory($"{path}/");
         }
 
+        public static string ValidFileName(string fileName) => Regex.Replace(fileName, @"[<>:""/\\|?*$]", "");
+
         //! verificar
         public static T CreateAsset<T>(string path, string assetName) where T : ScriptableObject
         {
-            string pattern = @"[^a-zA-Z]";
-            assetName = Regex.Replace(assetName, pattern, "");
-            string fullPath = $"{path}/{assetName}.asset";
+            //string pattern = @"[^a-zA-Z]";
+            string validFileName = ValidFileName(assetName);
+            //assetName = Regex.Replace(assetName, pattern, "");
+            string fullPath = $"{path}/{validFileName}.asset";
 
             // Regex pattern to keep only letters and digits(a - z, A - Z, 0 - 9)
-
             // Replace any character that doesn't match the pattern with an empty string
-
-
-            T asset = LoadAsset<T>(path, assetName);
+            T asset = LoadAsset<T>(path, validFileName);
 
             if (asset == null)
             {
