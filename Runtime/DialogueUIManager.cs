@@ -35,6 +35,7 @@ namespace DialogueSystem
         [SerializeField] private float popDuration = 0.2f;
         [SerializeField] private float popScale = 1.2f;
         [SerializeField] InputActionReference inputActionReference;
+        public InputAction test;
 
 
         public static event Action<DSActor, string> OnDialogueChanged = delegate { }; // evento pra disparar toda vez que o dialogo muda
@@ -62,6 +63,8 @@ namespace DialogueSystem
             dialogueGroupSelector = GetComponent<DialogueGroupSelector>();
             if (currentDialogue == null) currentDialogue = dialogueGroupSelector.targetDialogue;
 
+            inputActionReference.action.actionMap.Enable();
+
         }
 
         private void OnEnable()
@@ -71,29 +74,14 @@ namespace DialogueSystem
             {
                 InitializeDialogueUI(currentDialogue);
             }
+
+            inputActionReference.action.performed += InputDetected;
         }
 
-        public void StartDialogue(DialogueGroupSelector dialogue)
+        private void InputDetected(InputAction.CallbackContext context)
         {
-            actors = dialogue.ActorsOnDialogue;
-            dialogueUI.SetActive(true);
-            isDialogueHappening = true;
-            currentDialogue = dialogue.targetDialogue;
-            InitializeDialogueUI(currentDialogue);
-            OnDialogueStart.Invoke();
-        }
 
-        private void Update()
-        {
-            InputDetected();
-        }
-
-
-        //* REFATORAR: switch to new input system
-        // inputActionReference.action.WasPressedThisFrame();
-        private void InputDetected()
-        {
-            if (isDialogueHappening && Input.anyKeyDown)
+            if (isDialogueHappening && context.action.WasPressedThisFrame())
             {
                 if (currentDialogue.Choices[0].NextDialogue == null)
                 {
@@ -111,6 +99,16 @@ namespace DialogueSystem
                 }
 
             }
+        }
+
+        public void StartDialogue(DialogueGroupSelector dialogue)
+        {
+            actors = dialogue.ActorsOnDialogue;
+            dialogueUI.SetActive(true);
+            isDialogueHappening = true;
+            currentDialogue = dialogue.targetDialogue;
+            InitializeDialogueUI(currentDialogue);
+            OnDialogueStart.Invoke();
         }
 
         private void OnGUI()
