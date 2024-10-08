@@ -78,6 +78,11 @@ namespace DialogueSystem
             inputActionReference.action.performed += InputDetected;
         }
 
+        void OnDisable()
+        {
+            inputActionReference.action.performed -= InputDetected;
+        }
+
         private void InputDetected(InputAction.CallbackContext context)
         {
 

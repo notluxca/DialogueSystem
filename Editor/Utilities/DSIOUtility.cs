@@ -370,10 +370,10 @@ namespace DialogueSystem.Editor.Utilities
                 {
                     DSChoiceSaveData choiceData = (DSChoiceSaveData)choicePort.userData;
                     // if (choiceData.NodeID != null) Debug.LogError("Choice Data Null");
-                    if (string.IsNullOrEmpty(choiceData.NodeID.ToString())) //! Acusou : NullReferenceException: Object reference not set to an instance of an object
-                    {
-                        continue;
-                    }
+                    // if (string.IsNullOrEmpty(choiceData.NodeID.ToString())) //! Acusou : NullReferenceException: Object reference not set to an instance of an object
+                    // {
+                    //     continue;
+                    // }
 
                     DSNode nextNode = loadedNodes[choiceData.NodeID.ToString()];
 

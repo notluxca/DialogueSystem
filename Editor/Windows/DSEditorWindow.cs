@@ -17,7 +17,7 @@ namespace DialogueSystem.Editor.Windows
         private Button saveButton;
         private Button miniMapButton;
         private Button actorsButton;
-        private static TextField playerCharacter;
+
 
         private string lastLoadedFilePath = "";
 
@@ -53,10 +53,7 @@ namespace DialogueSystem.Editor.Windows
                 fileNameTextField.value = callback.newValue.RemoveWhitespaces().RemoveSpecialCharacters();
             });
 
-            playerCharacter = DSElementUtility.CreateTextField("Thaynara", "", callback =>
-            {
-                playerCharacter.value = callback.newValue.RemoveWhitespaces().RemoveSpecialCharacters();
-            });
+
 
             saveButton = DSElementUtility.CreateButton("Save", Save);
 
@@ -69,7 +66,6 @@ namespace DialogueSystem.Editor.Windows
             actorsButton = DSElementUtility.CreateButton("Actor", Actors);
 
             toolbar.Add(fileNameTextField);
-            toolbar.Add(playerCharacter);
             toolbar.Add(saveButton);
             toolbar.Add(loadButton);
             toolbar.Add(clearButton);
