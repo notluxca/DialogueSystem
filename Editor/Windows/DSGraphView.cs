@@ -41,10 +41,26 @@ namespace DialogueSystem.Editor.Windows
 
                 _graphView.SaveChoiceIdFromOutput(newEdge);
 
+
+                SetGroupByOutputNode(edge, newNode);
+
+
             }
 
             edge.RemoveFromHierarchy();
         }
+
+
+        public void SetGroupByOutputNode(Edge edge, DSNode newNode)
+        {
+            DSNode outputNode = edge.output.node as DSNode;
+            DSGroup outputGroup = outputNode.Group;
+
+            if (outputGroup == null) return;
+            _graphView.AddGroupedNode(newNode, outputGroup);
+            outputGroup.AddElement(newNode);
+        }
+
     }
 
 
@@ -55,9 +71,9 @@ namespace DialogueSystem.Editor.Windows
 
         private MiniMap miniMap;
 
-        private SerializableDictionary<string, DSNodeErrorData> ungroupedNodes;
-        private SerializableDictionary<string, DSGroupErrorData> groups;
-        private SerializableDictionary<Group, SerializableDictionary<string, DSNodeErrorData>> groupedNodes;
+        public SerializableDictionary<string, DSNodeErrorData> ungroupedNodes { get; private set; }
+        public SerializableDictionary<string, DSGroupErrorData> groups { get; private set; }
+        public SerializableDictionary<Group, SerializableDictionary<string, DSNodeErrorData>> groupedNodes { get; private set; }
 
         private int createdGroupsCount = 0;
 
@@ -212,7 +228,7 @@ namespace DialogueSystem.Editor.Windows
                     count++;
                 }
             }
-            Debug.Log(count);
+            // Debug.Log(count);
 
             return count > 1;
         }
@@ -379,7 +395,7 @@ namespace DialogueSystem.Editor.Windows
                 DSGroup dsGroup = (DSGroup)group;
 
                 dsGroup.title = newTitle.RemoveWhitespaces().RemoveSpecialCharacters();
-                Debug.Log("Nome modificado");
+                // Debug.Log("Nome modificado");
                 if (string.IsNullOrEmpty(dsGroup.title))
                 {
                     if (!string.IsNullOrEmpty(dsGroup.OldTitle))
@@ -590,7 +606,7 @@ namespace DialogueSystem.Editor.Windows
             List<DSNode> groupedNodesList = groupedNodes[group][nodeName].Nodes;  // Obtém a lista de nós do dicionário do grupo
 
             groupedNodesList.Add(node);  // Adiciona o nó à lista de nós
-            // Debug.Log($"teste: {nodeName}");
+                                         // Debug.Log($"teste: {nodeName}");
 
             // foreach (DSNode item in groupedNodesList)
             // {
@@ -723,7 +739,7 @@ namespace DialogueSystem.Editor.Windows
 
         public void ToggleMiniMap()
         {
-            Debug.Log("Botão Pressionado");
+            // Debug.Log("Botão Pressionado");
             miniMap.visible = !miniMap.visible;
         }
 

@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using System.Text.RegularExpressions;
 
 namespace DialogueSystem.Editor.Utilities
 {
     using Data.Save;
+    using DialogueSystem.Utilities;
     using Elements;
     using ScriptableObjects;
     using Windows;
-    using DialogueSystem.Utilities;
 
     public static class DSIOUtility
     {
@@ -170,8 +170,7 @@ namespace DialogueSystem.Editor.Utilities
                 Position = node.GetPosition().position
 
             };
-            Debug.Log(nodeData._SpeechAnimation);
-
+            // Debug.Log(nodeData._SpeechAnimation);
             graphData.Nodes.Add(nodeData);
         }
 
@@ -370,7 +369,7 @@ namespace DialogueSystem.Editor.Utilities
                 foreach (Port choicePort in loadedNode.Value.outputContainer.Children())
                 {
                     DSChoiceSaveData choiceData = (DSChoiceSaveData)choicePort.userData;
-                    if (choiceData.NodeID != null) Debug.LogError("Choice Data Null");
+                    // if (choiceData.NodeID != null) Debug.LogError("Choice Data Null");
                     if (string.IsNullOrEmpty(choiceData.NodeID.ToString())) //! Acusou : NullReferenceException: Object reference not set to an instance of an object
                     {
                         continue;
@@ -385,7 +384,7 @@ namespace DialogueSystem.Editor.Utilities
                     graphView.AddElement(edge);
 
                     loadedNode.Value.RefreshPorts();
-                    Debug.Log($"Carregou a edge {choiceData.NodeID.ToString()}");
+                    // Debug.Log($"Carregou a edge {choiceData.NodeID.ToString()}");
                 }
             }
         }
@@ -441,19 +440,19 @@ namespace DialogueSystem.Editor.Utilities
             FileUtil.DeleteFileOrDirectory($"{path}/");
         }
 
+        public static string ValidFileName(string fileName) => Regex.Replace(fileName, @"[<>:""/\\|?*$]", "");
+
         //! verificar
         public static T CreateAsset<T>(string path, string assetName) where T : ScriptableObject
         {
-            string pattern = @"[^a-zA-Z]";
-            assetName = Regex.Replace(assetName, pattern, "");
-            string fullPath = $"{path}/{assetName}.asset";
+            //string pattern = @"[^a-zA-Z]";
+            string validFileName = ValidFileName(assetName);
+            //assetName = Regex.Replace(assetName, pattern, "");
+            string fullPath = $"{path}/{validFileName}.asset";
 
             // Regex pattern to keep only letters and digits(a - z, A - Z, 0 - 9)
-
             // Replace any character that doesn't match the pattern with an empty string
-
-
-            T asset = LoadAsset<T>(path, assetName);
+            T asset = LoadAsset<T>(path, validFileName);
 
             if (asset == null)
             {
