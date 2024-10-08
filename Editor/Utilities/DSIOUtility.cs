@@ -170,8 +170,7 @@ namespace DialogueSystem.Editor.Utilities
                 Position = node.GetPosition().position
 
             };
-            Debug.Log(nodeData._SpeechAnimation);
-
+            // Debug.Log(nodeData._SpeechAnimation);
             graphData.Nodes.Add(nodeData);
         }
 
@@ -370,7 +369,7 @@ namespace DialogueSystem.Editor.Utilities
                 foreach (Port choicePort in loadedNode.Value.outputContainer.Children())
                 {
                     DSChoiceSaveData choiceData = (DSChoiceSaveData)choicePort.userData;
-                    if (choiceData.NodeID != null) Debug.LogError("Choice Data Null");
+                    // if (choiceData.NodeID != null) Debug.LogError("Choice Data Null");
                     if (string.IsNullOrEmpty(choiceData.NodeID.ToString())) //! Acusou : NullReferenceException: Object reference not set to an instance of an object
                     {
                         continue;
@@ -385,7 +384,7 @@ namespace DialogueSystem.Editor.Utilities
                     graphView.AddElement(edge);
 
                     loadedNode.Value.RefreshPorts();
-                    Debug.Log($"Carregou a edge {choiceData.NodeID.ToString()}");
+                    // Debug.Log($"Carregou a edge {choiceData.NodeID.ToString()}");
                 }
             }
         }

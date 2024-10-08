@@ -228,7 +228,7 @@ namespace DialogueSystem.Editor.Windows
                     count++;
                 }
             }
-            Debug.Log(count);
+            // Debug.Log(count);
 
             return count > 1;
         }
@@ -395,7 +395,7 @@ namespace DialogueSystem.Editor.Windows
                 DSGroup dsGroup = (DSGroup)group;
 
                 dsGroup.title = newTitle.RemoveWhitespaces().RemoveSpecialCharacters();
-                Debug.Log("Nome modificado");
+                // Debug.Log("Nome modificado");
                 if (string.IsNullOrEmpty(dsGroup.title))
                 {
                     if (!string.IsNullOrEmpty(dsGroup.OldTitle))
@@ -739,7 +739,7 @@ namespace DialogueSystem.Editor.Windows
 
         public void ToggleMiniMap()
         {
-            Debug.Log("Botão Pressionado");
+            // Debug.Log("Botão Pressionado");
             miniMap.visible = !miniMap.visible;
         }
 
