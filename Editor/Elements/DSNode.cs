@@ -75,7 +75,7 @@ namespace DialogueSystem.Editor.Elements
                 ++graphView.NameErrorsAmount;
             }
 
-            charactersDialogueAnimations = DSIOUtility.LoadAsset<CharacterDialogueAnimations>("Assets/Dialogue System/Resources", "CharactersDialogueAnimations");// <CharacterDialogueAnimations>("Assets/DataBase/Dialogues/DialogueAnimations/CharactersDialogueAnimations")
+            charactersDialogueAnimations = DSIOUtility.LoadAsset<CharacterDialogueAnimations>("Assets/Plugins/DialogueSystem/Resources", "CharactersDialogueAnimations");// <CharacterDialogueAnimations>("Assets/DataBase/Dialogues/DialogueAnimations/CharactersDialogueAnimations")
             if (!charactersDialogueAnimations) Debug.LogError("Node não conseguiu encontrar as animações de dialogo, por favor cheque o caminho para este asset.");
 
 

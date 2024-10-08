@@ -6,7 +6,7 @@ namespace DialogueSystem.Editor.Utilities
     public static class GlobalVariables
     {
 
-        public static string MainPath => "Assets/Dialogue System/";
+        public static string MainPath => "Assets/Plugins/DialogueSystem/";
         public static string DialoguesPath => "Assets/Resources/Dialogues";
         public static string StylePath => string.Concat(MainPath, "Editor/Styles/");
         public static string DialogueGraphsPath => string.Concat(DialoguesPath, "/Graphs");
