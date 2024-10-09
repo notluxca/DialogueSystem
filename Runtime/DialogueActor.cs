@@ -13,7 +13,7 @@ namespace DialogueSystem
     public class DialogueActor : MonoBehaviour
     {
         [Header("Animation settings")]
-        [SerializeField] float Fadetime;
+        [SerializeField] float Fadetime; // Actor fade in time
         [SerializeField] Color32 darkColor = new Color32(80, 80, 80, 255);
         Color32 startColor = new Color32(255, 255, 255, 255);
         public AnimationClip currentAnimationClip = null;
