@@ -14,6 +14,7 @@ namespace DialogueSystem
     using System.Text;
     using DialogueSystem.Enumerations;
     using ScriptableObjects;
+    using UnityEngine.Events;
     using UnityEngine.InputSystem;
 
     [RequireComponent(typeof(DialogueGroupSelector))]
@@ -35,12 +36,17 @@ namespace DialogueSystem
         [SerializeField] private float popDuration = 0.2f;
         [SerializeField] private float popScale = 1.2f;
         [SerializeField] InputActionReference inputActionReference;
-        public InputAction test;
+
+
+        [Header("Events")]
+        [SerializeField] UnityEvent OnDialogueStart;
+        [SerializeField] UnityEvent OnDialogueEnds;
+
 
 
         public static event Action<DSActor, string> OnDialogueChanged = delegate { }; // evento pra disparar toda vez que o dialogo muda
-        public event Action OnDialogueStart = delegate { };
-        public event Action OnDialogueEnd = delegate { };
+        // public event Action OnDialogueStart = delegate { };
+        // public event Action OnDialogueEnd = delegate { };
 
         public List<DSActor> actors = new List<DSActor>(); // Inicializa uma lista vazia
         private Vector3 originalScale = new Vector3(1.4f, 1.4f, 1); // modificar para ser dinamico
@@ -113,15 +119,7 @@ namespace DialogueSystem
             isDialogueHappening = true;
             currentDialogue = dialogue.targetDialogue;
             InitializeDialogueUI(currentDialogue);
-            OnDialogueStart.Invoke();
-        }
-
-        private void OnGUI()
-        {
-            if (GUI.Button(new Rect(10, 10, 50, 50), "Iniciar diálogo"))
-            {
-                StartDialogue(dialogueGroupSelector);
-            }
+            // OnDialogueStart.Invoke();
         }
 
 
@@ -272,19 +270,9 @@ namespace DialogueSystem
             dialogueText.text = "";
             listenerNameText.text = "";
             characterNameText.text = "";
-
-            // Limpar a lista de atores
-            // actors.Clear(); //! provavelmente oque está causando o erro, essa não é a lista correta de atores
-
-            // Desinscrever eventos, se necessário (adapte conforme a lógica do seu projeto)
-            // inputActionReference.action.performed -= OnInputAction;
-
-            // Parar animações ou corrotinas que possam estar rodando
             StopAllCoroutines();
 
-            // Resetar estados visuais ou animações
-
-            OnDialogueEnd.Invoke(); // Invocar o evento de finalização do diálogo
+            // OnDialogueEnd.Invoke(); // Invocar o evento de finalização do diálogo
         }
 
 
